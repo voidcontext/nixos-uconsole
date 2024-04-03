@@ -30,6 +30,9 @@ using cross compilation. In the future this will be configurable.
 nix build .\#images.sd-image-cm4 -L
 ```
 
+Once the image is flashed into an SD card the `/boot/config.txt` needs to be updated, see 
+[./config.txt](config.txt) (later this should be part of the build process).
+
 ## Sources
 
 - Kernel patches from  : https://github.com/PotatoMania/uconsole-cm3
