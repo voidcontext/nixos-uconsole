@@ -1,0 +1,78 @@
+{
+  nixpkgs,
+  nixos-hardware,
+  ...
+}: {pkgs, ...}: let
+  patches = [
+    ./patches/0001-video-backlight-Add-OCP8178-backlight-driver.patch
+    ./patches/0002-drm-panel-add-clockwork-cwu50.patch
+    ./patches/0003-driver-staging-add-uconsole-simple-amplifier-switch.patch
+    # ./patches/0004-arm-dts-overlays-add-uconsole.patch
+    ./patches/0005-drivers-power-axp20x-customize-PMU.patch
+    ./patches/0006-power-axp20x_battery-implement-calibration.patch
+    ./patches/0007-drm-panel-cwu50-expose-dsi-error-status-to-userspace.patch
+  ];
+in {
+  imports = [
+    "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+    nixos-hardware.nixosModules.raspberry-pi-4
+  ];
+  # Force cross compilation of the kernel, this way the kernel can be built on a stronger x86_64 machine
+  # While the rest of the aarch64 build can use the binary cache
+  boot.kernelPackages = let
+    p = import nixpkgs {localSystem = "x86_64-linux";};
+  in
+    p.pkgsCross.aarch64-multiplatform.linuxPackages_rpi4;
+
+  boot.kernelPatches =
+    (
+      builtins.map (patch: {
+        name = patch + "";
+        patch = patch;
+      })
+      patches
+    )
+    ++ [
+      {
+        name = "uconsole-config";
+        patch = null;
+        extraStructuredConfig = {
+          DRM_PANEL_CLOCKWORK_CWU50 = pkgs.lib.kernel.module;
+          SIMPLE_AMPLIFIER_SWITCH = pkgs.lib.kernel.module;
+          BACKLIGHT_OCP8178 = pkgs.lib.kernel.module;
+
+          REGMAP_I2C = pkgs.lib.kernel.yes;
+          INPUT_AXP20X_PEK = pkgs.lib.kernel.yes;
+          CHARGER_AXP20X = pkgs.lib.kernel.module;
+          BATTERY_AXP20X = pkgs.lib.kernel.module;
+          AXP20X_POWER = pkgs.lib.kernel.module;
+          MFD_AXP20X = pkgs.lib.kernel.yes;
+          MFD_AXP20X_I2C = pkgs.lib.kernel.yes;
+          REGULATOR_AXP20X = pkgs.lib.kernel.yes;
+          AXP20X_ADC = pkgs.lib.kernel.module;
+          TI_ADC081C = pkgs.lib.kernel.module;
+          CRYPTO_LIB_ARC4 = pkgs.lib.kernel.yes;
+          CRC_CCITT = pkgs.lib.kernel.yes;
+        };
+      }
+    ];
+
+  networking.networkmanager.enable = true;
+  powerManagement.cpuFreqGovernor = "ondemand";
+  services.openssh.enable = true;
+
+  hardware.raspberry-pi."4".apply-overlays-dtmerge.enable = true;
+  hardware.deviceTree.enable = true;
+  hardware.deviceTree.overlays = [
+    {
+      name = "uconsole";
+      dtsFile = ./uconsole-overlay.dts;
+      filter = "bcm2711-rpi-cm4.dtb";
+    }
+    {
+      name = "uconsole";
+      dtsFile = ./uconsole-overlay.dts;
+      filter = "bcm2711-rpi-cm4s.dtb";
+    }
+  ];
+}
