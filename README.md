@@ -1,8 +1,10 @@
-# nixos-uconsole-cm4
+# nixos-uconsole
 
-NixOS module and base SD card image for clockworkPi uConsole using RasberryPi Compute Module 4.
+NixOS module and base SD card image for clockworkPi uConsole.
 
 ## Status
+
+For now, only devices using the RaspberryPi Compute Module 4 are supported.
 
 Many things just doesn't work at the moment, the sd image boots, but it can only be confirmed using
 the HDMI output, and it's impossible to log in since the keyboard doesn't work.
