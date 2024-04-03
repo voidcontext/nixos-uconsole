@@ -3,10 +3,16 @@
   nixos-hardware,
   ...
 }: {pkgs, ...}: let
+  # These patches are copied over from:
+  # https://github.com/PotatoMania/uconsole-cm3/tree/1bfce6701e6ac9f1c2fdfc75fcd4cbc184a13813/PKGBUILDs/linux-uconsole-cm3-rpi64
+  #
+  # TODO: find a better way of declare attribution
   patches = [
     ./patches/0001-video-backlight-Add-OCP8178-backlight-driver.patch
     ./patches/0002-drm-panel-add-clockwork-cwu50.patch
     ./patches/0003-driver-staging-add-uconsole-simple-amplifier-switch.patch
+    # The device tree patch is not applied to the kernel at compile time (to avoid rebuild),
+    # but merged later using NixOS' `hardware.deviceTree` confdig.
     # ./patches/0004-arm-dts-overlays-add-uconsole.patch
     ./patches/0005-drivers-power-axp20x-customize-PMU.patch
     ./patches/0006-power-axp20x_battery-implement-calibration.patch
@@ -19,6 +25,7 @@ in {
   ];
   # Force cross compilation of the kernel, this way the kernel can be built on a stronger x86_64 machine
   # While the rest of the aarch64 build can use the binary cache
+  # TODO: make this configurable
   boot.kernelPackages = let
     p = import nixpkgs {localSystem = "x86_64-linux";};
   in
@@ -37,10 +44,13 @@ in {
         name = "uconsole-config";
         patch = null;
         extraStructuredConfig = {
+          # Enable the newly patched modules
           DRM_PANEL_CLOCKWORK_CWU50 = pkgs.lib.kernel.module;
           SIMPLE_AMPLIFIER_SWITCH = pkgs.lib.kernel.module;
           BACKLIGHT_OCP8178 = pkgs.lib.kernel.module;
 
+          # Port over some configs from the official image
+          # Source: https://jhewitt.net/uconsole
           REGMAP_I2C = pkgs.lib.kernel.yes;
           INPUT_AXP20X_PEK = pkgs.lib.kernel.yes;
           CHARGER_AXP20X = pkgs.lib.kernel.module;
