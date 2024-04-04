@@ -12,13 +12,13 @@ the HDMI output, and it's impossible to log in since the keyboard doesn't work.
 |                   | Does it work? |
 |------------------ | ------------- |
 | boot              | ✓             |
-| built-in display  | x             |
+| built-in display  | ✓             |
 | backlight         | ✓             |
 | hdmi output       | ✓             |
-| built-in keyboard | x             |
-| usb keyboard      | x             |
-| bluetooth         | n/a           |
-| wifi              | n/a           |
+| built-in keyboard | ✓             |
+| usb keyboard      | ?             |
+| bluetooth         | ?             |
+| wifi              | ?             |
 
 ## Development
 
@@ -27,11 +27,13 @@ this is required to be able to offload the kernel compilation to a potentially s
 using cross compilation. In the future this will be configurable.
 
 ```bash
-nix build .\#images.sd-image-cm4 -L
+nix build .\#packages.aarch64-linux.\"sd-image-cm4-6.1-potatomania-cross-build\" -L
 ```
 
-Once the image is flashed into an SD card the `/boot/config.txt` needs to be updated, see 
-[./config.txt](config.txt) (later this should be part of the build process).
+Once the image is flashed into an SD card the `/boot/config.txt` needs to be updated and copied over
+from the relevant kernel's directory.
+
+The available images, and NixOS modules are all discoverable using `nix flake show`.
 
 ## Sources
 
