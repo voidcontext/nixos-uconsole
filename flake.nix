@@ -19,16 +19,36 @@
       # (final: super: {zfs = super.zfs.overrideAttrs (_: {meta.platforms = [];});}) # disable zfs
     ];
 
+    lib = import ./lib.nix {inherit nixpkgs;};
+
     pkgs = import nixpkgs {inherit system overlays;};
 
     base-module = import ./module.nix {inherit nixpkgs nixos-hardware;};
 
-    base-system-cm4 = nixpkgs.lib.nixosSystem {
-      inherit system pkgs;
+    kernels = import ./kernels/default.nix {inherit nixpkgs nixos-hardware lib;};
 
-      modules = [base-module];
-    };
+    base-system-cm4 = kernel:
+      nixpkgs.lib.nixosSystem {
+        inherit system pkgs;
+
+        modules = [base-module kernel];
+      };
+
+    images =
+      pkgs.lib.attrsets.mapAttrs' (name: value: {
+        name = "sd-image-cm4-${name}";
+        value = (base-system-cm4 value).config.system.build.sdImage;
+      })
+      kernels;
   in {
-    images.sd-image-cm4 = base-system-cm4.config.system.build.sdImage;
+    packages."aarch64-linux" = images;
+
+    nixosModules =
+      {default = base-module;}
+      // (pkgs.lib.attrsets.mapAttrs' (name: value: {
+          name = "kernel-${name}";
+          inherit value;
+        })
+        kernels);
   };
 }

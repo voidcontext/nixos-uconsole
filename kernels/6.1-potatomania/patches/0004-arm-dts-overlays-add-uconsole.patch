@@ -40,7 +40,7 @@ index 000000000000..2b1c8a884d5b
 +/* uConsole All In One */
 +
 +/ {
-+	compatible = "brcm,bcm2711";
++	compatible = "brcm,bcm2835";
 +
 +	fragment@70 {
 +		target-path = "/aliases";
