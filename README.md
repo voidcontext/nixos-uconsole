@@ -18,17 +18,27 @@ the HDMI output, and it's impossible to log in since the keyboard doesn't work.
 | built-in keyboard | ✓             |
 | usb keyboard      | ?             |
 | bluetooth         | ?             |
-| wifi              | ?             |
+| wifi              | x             |
 
 ## Development
 
-To build the image you'll need 2 machines: an `x86_64-linux` and an `aarch64-linux` build machine,
-this is required to be able to offload the kernel compilation to a potentially stronger computer
-using cross compilation. In the future this will be configurable.
+The kernels are available in 2 versions:
+
+as normal `aarch64-linux` build, e.g:
+
+```bash
+nix build .\#packages.aarch64-linux.\"sd-image-cm4-6.1-potatomania\" -L
+```
+
+and with a config where the kernel is cross built on `x86_64-linux`, e.g:
 
 ```bash
 nix build .\#packages.aarch64-linux.\"sd-image-cm4-6.1-potatomania-cross-build\" -L
 ```
+
+For cross building you'll need 2 machines: an `x86_64-linux` and an `aarch64-linux` build machine.
+This is useful when you want to offload the kernel compilation to a potentially stronger computer
+using cross compilation.
 
 Once the image is flashed into an SD card the `/boot/config.txt` needs to be updated and copied over
 from the relevant kernel's directory.
