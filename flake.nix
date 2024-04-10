@@ -43,6 +43,8 @@
   in {
     packages."aarch64-linux" = images;
 
+    nixosConfigurations.uconsole = base-system-cm4 kernels."6.1-potatomania-cross-build";
+
     nixosModules =
       {default = base-module;}
       // (pkgs.lib.attrsets.mapAttrs' (name: value: {

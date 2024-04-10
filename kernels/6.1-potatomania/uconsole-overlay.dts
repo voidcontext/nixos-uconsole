@@ -39,10 +39,15 @@
 		__overlay__ {
 			wifi_pwrseq: wifi-pwrseq {
 				compatible = "mmc-pwrseq-simple";
-				pinctrl-names = "default";
-				pinctrl-0 = <&wifi_rst_pin>;
-				reset-gpios = <&gpio 3 1>; /* GPIO3, GPIO_ACTIVE_LOW */
-				post-power-on-delay-ms = <200>;
+
+				// From potatomania
+				// pinctrl-names = "default";
+				// pinctrl-0 = <&wifi_rst_pin>;
+				// reset-gpios = <&gpio 3 1>; /* GPIO3, GPIO_ACTIVE_LOW */
+				// post-power-on-delay-ms = <200>;
+
+				// Official from clockwork
+				reset-gpios = <&gpio 3 0>;
 			};
 
 			audio_amplifier: audio-amplifier {
@@ -117,27 +122,53 @@
 
 	fragment@92 {
 		/* WLAN */
+
+		// From potatomania
 		/* The general purpose SDHCI interface(SD1) */
+		// target = <&mmc>;
+		// __overlay__ {
+		// 	pinctrl-0 = <&sdio_gpio22>;
+		// 	pinctrl-names = "default";
+		// 	mmc-pwrseq = <&wifi_pwrseq>;
+		// 	// non-removable; /* don't use this, so the chip can be reliably initialized */
+		// 	bus-width = <4>;
+		// 	status = "okay";
+		// 	#address-cells = <1>;
+		// 	#size-cells = <0>;
+		// 	vmmc-supply = <&reg_dldo1>;
+		// 	vqmmc-supply = <&reg_aldo3>;
+
+		// 	brcmf: wifi@1 {
+		// 		reg = <1>;
+		// 		compatible = "brcm,bcm43456-fmac", "brcm,bcm4329-fmac";
+		// 		/* The interrupt will not registered on CM3, so skip below */
+		// 		// interrupt-parent = <&gpio>;
+		// 		// interrupts = <4 8>; /* GPIO4, IRQ_TYPE_LEVEL_LOW */
+		// 		// interrupt-names = "host-wake";
+		// 	};
+		// };
+
+		// Official, clockwork
+	};
+
+	fragment@94 {
 		target = <&mmc>;
-		__overlay__ {
-			pinctrl-0 = <&sdio_gpio22>;
+		sdio_ovl: __overlay__ {
+			pinctrl-0 = <&sdio_ovl_pins>;
 			pinctrl-names = "default";
-			mmc-pwrseq = <&wifi_pwrseq>;
-			// non-removable; /* don't use this, so the chip can be reliably initialized */
+			non-removable;
 			bus-width = <4>;
 			status = "okay";
-			#address-cells = <1>;
-			#size-cells = <0>;
-			vmmc-supply = <&reg_dldo1>;
-			vqmmc-supply = <&reg_aldo3>;
+		};
+	};
 
-			brcmf: wifi@1 {
-				reg = <1>;
-				compatible = "brcm,bcm43456-fmac", "brcm,bcm4329-fmac";
-				/* The interrupt will not registered on CM3, so skip below */
-				// interrupt-parent = <&gpio>;
-				// interrupts = <4 8>; /* GPIO4, IRQ_TYPE_LEVEL_LOW */
-				// interrupt-names = "host-wake";
+	fragment@94 {
+		target = <&gpio>;
+		__overlay__ {
+			sdio_ovl_pins: sdio_ovl_pins {
+				brcm,pins = <22 23 24 25 26 27>;
+				brcm,function = <7>; /* ALT3 = SD1 */
+				brcm,pull = <0 2 2 2 2 2>;
 			};
 		};
 	};
