@@ -17,8 +17,28 @@ the HDMI output, and it's impossible to log in since the keyboard doesn't work.
 | hdmi output       | ✓             |
 | built-in keyboard | ✓             |
 | usb keyboard      | ?             |
-| bluetooth         | ?             |
-| wifi              | x             |
+| bluetooth         | x             |
+| wifi              | ✓             |
+| audio             | x             |
+| fast charging     | ✓             |
+
+## Usage
+
+### NixOS module
+
+```nix
+```
+
+### SD card image
+
+Build one of the sd-image packages, e.g:
+
+```
+nix build .\#packages.aarch64-linux.\"sd-image-cm4-6.1-potatomania\" -L
+```
+
+Then flash the img file from `result/sd-image`. For more information see [Development](#development)
+section.
 
 ## Development
 
