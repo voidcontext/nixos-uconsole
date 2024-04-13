@@ -1,14 +1,10 @@
 {
-  nixpkgs,
-  nixos-hardware,
-  lib,
-}: {
-  "6.1-potatomania" = import ./6.1-potatomania {
-    inherit nixpkgs lib nixos-hardware;
-    cross = false;
+  "6.1-potatomania" = {...}: {
+    imports = [ ./6.1-potatomania ];
+    uconsole.boot.kernel.crossBuild = false;
   };
-  "6.1-potatomania-cross-build" = import ./6.1-potatomania {
-    inherit nixpkgs lib nixos-hardware;
-    cross = true;
+  "6.1-potatomania-cross-build" = {
+    imports = [ ./6.1-potatomania ];
+    uconsole.boot.kernel.crossBuild = true;
   };
 }

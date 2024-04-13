@@ -19,17 +19,18 @@
       # (final: super: {zfs = super.zfs.overrideAttrs (_: {meta.platforms = [];});}) # disable zfs
     ];
 
-    lib = import ./lib.nix {inherit nixpkgs;};
-
     pkgs = import nixpkgs {inherit system overlays;};
 
-    base-module = import ./module.nix {inherit nixpkgs nixos-hardware;};
+    base-module = import ./module.nix {inherit nixpkgs;};
 
-    kernels = import ./kernels/default.nix {inherit nixpkgs nixos-hardware lib;};
+    kernels = import ./kernels/default.nix;
 
     base-system-cm4 = kernel:
       nixpkgs.lib.nixosSystem {
         inherit system pkgs;
+        specialArgs = {
+          inherit nixpkgs nixos-hardware;
+        };
 
         modules = [base-module kernel];
       };

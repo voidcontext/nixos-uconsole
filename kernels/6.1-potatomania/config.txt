@@ -1,9 +1,6 @@
 [pi3]
 kernel=u-boot-rpi3.bin
 
-[pi02]
-kernel=u-boot-rpi3.bin
-
 [pi4]
 kernel=u-boot-rpi4.bin
 enable_gic=1
@@ -24,8 +21,8 @@ arm_boost=1
 # ------------------------
 arm_boost=1
 max_framebuffers=2
-dtoverlay=vc4-kms-v3d-pi4,cma-384
-dtoverlay=uconsole,cm4
+# dtoverlay=vc4-kms-v3d-pi4,cma-384
+# dtoverlay=uconsole,cm4
 # ------------------------
 
 [all]
@@ -53,5 +50,6 @@ gpio=10=ip,np
 dtoverlay=dwc2,dr_mode=host
 dtoverlay=audremap,pins_12_13
 dtparam=audio=on
-dtparam=spi=on
+# dtparam=spi=on
+dtparam=ant2
 # ------------------------
