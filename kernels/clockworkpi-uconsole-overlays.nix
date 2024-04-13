@@ -295,7 +295,7 @@
       		__overlay__  {
       			battery: battery@0 {
       				compatible = "simple-battery";
-      				constant_charge_current_max_microamp = <2100000>;
+      				constant-charge-current-max-microamp = <2100000>;
       				voltage-min-design-microvolt = <3300000>;
       			};
       		};
